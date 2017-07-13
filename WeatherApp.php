@@ -83,6 +83,7 @@ margin-top: 10px;
         <h1>The Weather App</h1>
 
         <p>Enter the name of your city</p>
+        <p>Below</p>
 
 <form>
     <fieldset class="form-group">
