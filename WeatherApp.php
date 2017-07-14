@@ -1,15 +1,56 @@
 
 <?php
 
+$result = '';
+
 
 if ($_GET["city"]) {
 
-$forecastPage = file_get_contents("http://www.weather-forecast.com/locations/London/forecasts/latest");
+
+$city = str_replace(' ', '', $_GET['city']);
 
 
-echo $forecastPage;
+$file_headers = @get_headers("http://www.weather-forecast.com/locations/".$city."/forecasts/latest");
+
+if($file_headers[0] == 'HTTP/1.1 404 Not Found') {
+    
+    $error = "This City doesn't Exist";
+}
+
+else {
+
+$forecastPage = file_get_contents("http://www.weather-forecast.com/locations/".$city."/forecasts/latest");
+
+
+$pageArray = explode('3 Day Weather Forecast Summary:</b><span class="read-more-small"><span class="read-more-content"> <span class="phrase">',$forecastPage);
+
+if (sizeOf($pageArray)>1) {
+
+
+$secondArray = explode('</span></span></span>',
+$pageArray[1]);
 
 }
+
+else {
+
+  $error = "This City doesn't Exist";
+
+}
+
+if (sizeOf($secondArray)>1) {
+
+$result = $secondArray[0];
+
+} else {
+
+$error = "This City doesn't Exist";
+
+          }
+
+      }
+ }
+
 
 
 
@@ -54,9 +95,17 @@ background: none;
 }
 
 .container {
+
     text-align: center;
-    margin-top:200px;
+    margin-top:150px;
     width: 400px;
+
+}
+
+#weather{
+
+    padding-top:10px;
+
 
 }
 
@@ -66,8 +115,6 @@ margin-top: 10px;
 }
 
   </style>
-  
-  
   
   </head>
   
@@ -83,17 +130,32 @@ margin-top: 10px;
         <h1>The Weather App</h1>
 
         <p>Enter the name of your city</p>
-        <p>Below</p>
 
 <form>
     <fieldset class="form-group">
-        <input type="text" class="form-control" name="city" id="enterCity" placeholder="Enter City...">
+        <input type="text" class="form-control"  name="city" id="enterCity" placeholder="Enter City..." value="<?php echo $_GET['city']; ?>">
       
     </fielset>
 
     
         <button type="submit" class="btn btn-primary">Submit</button>
 
+
+        <div id='weather'><?php
+        
+        if ($result){
+
+          echo '<div class="alert alert-success" role="alert">'.$result.' </div>';
+
+
+        } else  if($error) {
+
+          echo '<div class="alert alert-danger" role="alert"><strong>'.$error.'</strong>. Try again... </div>';
+
+        }
+        
+?></div>
+        
     </form>
 
  </div>
